@@ -163,13 +163,14 @@
     <header class="bg-white shadow-sm border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1">
                     <h1 class="md:text-2xl flex font-bold text-gray-900">
                         <i class="md:mt-1 fas fa-calendar-alt text-blue-600 mr-2"></i>
                         <div class="hidden md:block">我的日历</p>
                     </h1>
-                    <div class="text-sm text-gray-500">
-                        <span id="onlineUsers">在线用户: 1</span>
+                    <div class="flex text-sm text-gray-500">
+                        <div class="hidden md:block">在线用户:</div>
+                        <span id="onlineUsers"></span>
                     </div>
                 </div>
             
@@ -187,12 +188,13 @@
                         <!-- Adjusted margin -->
                         <span id="statusText">连接中...</span>
                     </div>
-                    <button id="todayBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-calendar-day mr-2"></i>
+                    <button id="todayBtn" class="flex  px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="mt-0 md:mt-1 fas fa-calendar-day mr-2"></i>
                         <div class="hidden md:block">今天</div>
+                        
                     </button>
-                    <button id="addEventBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                        <i class="fas fa-plus mr-2"></i>
+                    <button id="addEventBtn" class="flex px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="mt-0 md:mt-1 fas fa-plus mr-2"></i>
                         <div class="hidden md:block">添加事件</div>
                     </button>
                 </div>
@@ -327,54 +329,126 @@
 
     <script>
         class Calendar {
-            // 在constructor中
             constructor() {
                 this.currentDate = new Date();
                 this.events = JSON.parse(localStorage.getItem('calendarEvents')) || [];
                 this.selectedColor = 'blue';
                 this.currentEventId = null;
-                this.viewMode = 'month'; // 'month' or 'week'
+                this.viewMode = 'month';
                 this.currentWeekStart = null;
+                
+                // WebSocket重连配置
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 10;
+                this.reconnectDelay = 1000; // 初始重连延迟1秒
+                this.maxReconnectDelay = 30000; // 最大重连延迟30秒
+                this.heartbeatInterval = null;
+                this.heartbeatTimeout = null;
+                this.isManualClose = false;
+                this.isPageVisible = true;
+                
                 this.init();
             }
-
+        
             init() {
                 this.connectWebSocket();
                 this.bindEvents();
                 this.renderCalendar();
                 this.updateCurrentPeriod();
+                this.setupPageVisibilityHandler();
             }
-
-            // WebSocket连接管理
+        
+            // 设置页面可见性处理
+            setupPageVisibilityHandler() {
+                document.addEventListener('visibilitychange', () => {
+                    this.isPageVisible = !document.hidden;
+                    
+                    if (this.isPageVisible) {
+                        // 页面变为可见时，检查连接状态
+                        if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+                            console.log('页面重新可见，检查WebSocket连接');
+                            this.connectWebSocket();
+                        }
+                    }
+                });
+                
+                // 监听网络状态变化
+                window.addEventListener('online', () => {
+                    console.log('网络重新连接');
+                    this.showNotification('网络已恢复，正在重新连接...', 'info');
+                    this.connectWebSocket();
+                });
+                
+                window.addEventListener('offline', () => {
+                    console.log('网络断开');
+                    this.showNotification('网络连接断开', 'error');
+                    this.updateConnectionStatus('disconnected');
+                });
+            }
+        
+            // 优化的WebSocket连接管理
             connectWebSocket() {
+                // 如果已有连接且状态正常，不重复连接
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    return;
+                }
+                
+                // 清理现有连接
+                this.cleanupWebSocket();
+                
                 try {
-                    // 根据当前协议选择WebSocket协议
                     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                    // 使用当前页面的完整路径构建WebSocket URL，支持子路径
                     const wsUrl = `${protocol}//${window.location.host}${window.location.pathname.replace(/\/$/, '')}/ws`;
                     console.log('WebSocket URL:', wsUrl);
+                    
                     this.websocket = new WebSocket(wsUrl);
                     this.updateConnectionStatus('connecting');
+                    
+                    // 设置连接超时
+                    const connectionTimeout = setTimeout(() => {
+                        if (this.websocket.readyState === WebSocket.CONNECTING) {
+                            console.log('WebSocket连接超时');
+                            this.websocket.close();
+                        }
+                    }, 10000); // 10秒超时
             
                     this.websocket.onopen = () => {
+                        clearTimeout(connectionTimeout);
                         console.log('WebSocket连接已建立');
                         this.updateConnectionStatus('connected');
                         this.reconnectAttempts = 0;
+                        this.isManualClose = false;
+                        
+                        // 启动心跳检测
+                        this.startHeartbeat();
+                        
                         this.sendViewRange();
                         this.requestEvents();
+                        
+                        this.showNotification('连接已建立', 'success');
                     };
             
                     this.websocket.onmessage = (event) => {
                         this.handleWebSocketMessage(JSON.parse(event.data));
+                        // 收到消息时重置心跳
+                        this.resetHeartbeat();
                     };
             
-                    this.websocket.onclose = () => {
-                        console.log('WebSocket连接已关闭');
+                    this.websocket.onclose = (event) => {
+                        clearTimeout(connectionTimeout);
+                        this.stopHeartbeat();
+                        
+                        console.log('WebSocket连接已关闭', event.code, event.reason);
                         this.updateConnectionStatus('disconnected');
-                        this.attemptReconnect();
+                        
+                        // 只有在非手动关闭且页面可见时才尝试重连
+                        if (!this.isManualClose && this.isPageVisible) {
+                            this.attemptReconnect();
+                        }
                     };
             
                     this.websocket.onerror = (error) => {
+                        clearTimeout(connectionTimeout);
                         console.error('WebSocket错误:', error);
                         this.updateConnectionStatus('disconnected');
                     };
@@ -384,17 +458,88 @@
                     this.attemptReconnect();
                 }
             }
-
+        
+            // 清理WebSocket连接
+            cleanupWebSocket() {
+                if (this.websocket) {
+                    this.isManualClose = true;
+                    this.stopHeartbeat();
+                    
+                    if (this.websocket.readyState === WebSocket.OPEN || 
+                        this.websocket.readyState === WebSocket.CONNECTING) {
+                        this.websocket.close();
+                    }
+                    
+                    this.websocket = null;
+                }
+            }
+        
+            // 启动心跳检测
+            startHeartbeat() {
+                this.stopHeartbeat();
+                
+                this.heartbeatInterval = setInterval(() => {
+                    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                        this.websocket.send(JSON.stringify({ type: 'ping' }));
+                        
+                        // 设置心跳超时
+                        this.heartbeatTimeout = setTimeout(() => {
+                            console.log('心跳超时，关闭连接');
+                            this.websocket.close();
+                        }, 5000);
+                    }
+                }, 30000); // 每30秒发送一次心跳
+            }
+        
+            // 重置心跳
+            resetHeartbeat() {
+                if (this.heartbeatTimeout) {
+                    clearTimeout(this.heartbeatTimeout);
+                    this.heartbeatTimeout = null;
+                }
+            }
+        
+            // 停止心跳检测
+            stopHeartbeat() {
+                if (this.heartbeatInterval) {
+                    clearInterval(this.heartbeatInterval);
+                    this.heartbeatInterval = null;
+                }
+                
+                if (this.heartbeatTimeout) {
+                    clearTimeout(this.heartbeatTimeout);
+                    this.heartbeatTimeout = null;
+                }
+            }
+        
+            // 优化的重连机制
             attemptReconnect() {
+                // 如果页面不可见或网络离线，不进行重连
+                if (!this.isPageVisible || !navigator.onLine) {
+                    console.log('页面不可见或网络离线，暂停重连');
+                    return;
+                }
+                
                 if (this.reconnectAttempts < this.maxReconnectAttempts) {
                     this.reconnectAttempts++;
-                    console.log(`尝试重连 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+                    
+                    // 指数退避算法计算延迟时间
+                    const delay = Math.min(
+                        this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
+                        this.maxReconnectDelay
+                    );
+                    
+                    console.log(`尝试重连 (${this.reconnectAttempts}/${this.maxReconnectAttempts})，${delay}ms后重试`);
+                    this.showNotification(`连接断开，${Math.ceil(delay/1000)}秒后重试 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`, 'info');
                     
                     setTimeout(() => {
-                        this.connectWebSocket();
-                    }, this.reconnectDelay * this.reconnectAttempts);
+                        if (!this.isManualClose && this.isPageVisible) {
+                            this.connectWebSocket();
+                        }
+                    }, delay);
                 } else {
-                    this.showNotification('连接失败，请刷新页面重试', 'error');
+                    console.log('达到最大重连次数，停止重连');
+                    this.showNotification('连接失败，请手动刷新页面重试', 'error');
                 }
             }
 
@@ -442,7 +587,7 @@
                         this.showNotification('事件已删除', 'info');
                         break;
                     case 'online_users':
-                        document.getElementById('onlineUsers').textContent = `在线用户: ${data.count}`;
+                        document.getElementById('onlineUsers').textContent = `${data.count}`;
                         break;
                     case 'error':
                         this.showNotification(data.message, 'error');
@@ -453,8 +598,12 @@
             sendWebSocketMessage(data) {
                 if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
                     this.websocket.send(JSON.stringify(data));
+                    return true;
                 } else {
-                    this.showNotification('连接断开，请稍后重试', 'error');
+                    this.showNotification('连接断开，消息发送失败，正在重连...', 'error');
+                    // 尝试重新连接
+                    this.connectWebSocket();
+                    return false;
                 }
             }
 
