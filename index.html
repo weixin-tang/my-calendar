@@ -164,17 +164,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-4">
-                    <h1 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
-                        我的日历
+                    <h1 class="md:text-2xl flex font-bold text-gray-900">
+                        <i class="md:mt-1 fas fa-calendar-alt text-blue-600 mr-2"></i>
+                        <div class="hidden md:block">我的日历</p>
                     </h1>
                     <div class="text-sm text-gray-500">
                         <span id="onlineUsers">在线用户: 1</span>
-                    </div>
-                    <!-- 添加时区显示 -->
-                    <div class="text-sm text-gray-500 flex items-center">
-                        <i class="fas fa-globe mr-1"></i>
-                        <span>上海时区 (UTC+8)</span>
                     </div>
                 </div>
             
@@ -188,14 +183,17 @@
                 <div class="flex items-center space-x-4">
                     <!-- 连接状态指示器 - 靠右 -->
                     <div id="connectionStatus" class="connection-status status-connecting">
-                        <i class="fas fa-circle mr-1"></i> <!-- Adjusted margin -->
+                        <!-- <i class="fas fa-circle mr-1"></i>  -->
+                        <!-- Adjusted margin -->
                         <span id="statusText">连接中...</span>
                     </div>
                     <button id="todayBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-calendar-day mr-2"></i>今天
+                        <i class="fas fa-calendar-day mr-2"></i>
+                        <div class="hidden md:block">今天</div>
                     </button>
                     <button id="addEventBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                        <i class="fas fa-plus mr-2"></i>添加事件
+                        <i class="fas fa-plus mr-2"></i>
+                        <div class="hidden md:block">添加事件</div>
                     </button>
                 </div>
             </div>
@@ -205,25 +203,26 @@
     <!-- 日历控制栏 -->
     <div class="bg-white border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-4">
-                    <button id="prevPeriod" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <div class="grid grid-cols-7 py-2 md:py-0 md:flex md:justify-between md:items-center md:py-4 ">
+                <div class="col-span-4 flex md:flex md:items-center md:space-x-4">
+                    <button id="prevPeriod" class="md:p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <i class="fas fa-chevron-left text-gray-600"></i>
                     </button>
-                    <h2 id="currentPeriod" class="text-xl font-semibold text-gray-900 min-w-[200px] text-center"></h2>
-                    <button id="nextPeriod" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <h2 id="currentPeriod" class="mt-2 md:mt-0 text-xl font-semibold text-gray-900 min-w-[200px] text-center"></h2>
+                    <button id="nextPeriod" class="md:p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <i class="fas fa-chevron-right text-gray-600"></i>
                     </button>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="monthView" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium">
+                <div class="col-span-3 grid grid-cols-2 gap-1 md:flex md:items-center md:space-x-2">
+                    <button id="monthView" class="px-1 md:px-3 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium">
                         <i class="fas fa-calendar mr-2"></i>月视图
                     </button>
-                    <button id="weekView" class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <button id="weekView" class="px-1 md:px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                         <i class="fas fa-calendar-week mr-2"></i>周视图
                     </button>
                 </div>
             </div>
+
         </div>
     </div>
 

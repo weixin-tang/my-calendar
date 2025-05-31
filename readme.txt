@@ -38,7 +38,7 @@ docker run -p 8027:8027 calendar-app
 
 
 
-docker container rm -f calendar-app && docker run -itd --name calendar-app --hostname calendar-app --network weixin-network -e PORT=80 -e ROOT_PATH="/calendar" calendar-app
+docker container rm -f calendar-app && docker run -itd --restart always --name calendar-app --hostname calendar-app --network weixin-network -e PORT=80 -e ROOT_PATH="/calendar" calendar-app
 
 
     location /calendar {
