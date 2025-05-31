@@ -36,5 +36,19 @@ docker build -t calendar-app .
 会使用默认值 /calendar
 docker run -p 8027:8027 calendar-app
 
-docker run -itd --name calendar-app --hostname calendar-app --network weixin-network -p 8027:8027 -e ROOT_PATH="/calendar" calendar-app
 
+
+docker container rm -f calendar-app && docker run -itd --name calendar-app --hostname calendar-app --network weixin-network -e PORT=80 -e ROOT_PATH="/calendar" calendar-app
+
+
+    location /calendar {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://calendar-app:80;
+        proxy_redirect default;
+     }
