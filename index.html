@@ -399,7 +399,7 @@
                 try {
                     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                     const wsUrl = `${protocol}//${window.location.host}${window.location.pathname.replace(/\/$/, '')}/ws`;
-                    console.log('WebSocket URL:', wsUrl);
+                    // console.log('WebSocket URL:', wsUrl);
                     
                     this.websocket = new WebSocket(wsUrl);
                     this.updateConnectionStatus('connecting');
@@ -589,8 +589,13 @@
                     case 'online_users':
                         document.getElementById('onlineUsers').textContent = `${data.count}`;
                         break;
+                    case 'ping':
+                        // 收到pong消息时重置心跳
+                        this.resetHeartbeat();
+                        break;
                     case 'error':
-                        this.showNotification(data.message, 'error');
+                        console.error('WebSocket错误:', data);
+                        // this.showNotification(data.message, 'error');
                         break;
                 }
             }

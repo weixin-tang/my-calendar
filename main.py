@@ -246,9 +246,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     }, websocket)
             
             else:
+                # print("未知的消息类型" ,data)
                 await manager.send_personal_message({
                     "type": "error",
-                    "message": "未知的消息类型"
+                    "message": "未知的消息类型" ,
                 }, websocket)
                 
     except WebSocketDisconnect:
