@@ -29,3 +29,12 @@ curl -X PUT http://localhost:8027/api/events/{event_id} \
 # 删除事件
 curl -X DELETE http://localhost:8027/api/events/{event_id}
 
+
+docker build -t calendar-app .
+
+
+会使用默认值 /calendar
+docker run -p 8027:8027 calendar-app
+
+docker run -itd --name calendar-app --hostname calendar-app --network weixin-network -p 8027:8027 -e ROOT_PATH="/calendar" calendar-app
+

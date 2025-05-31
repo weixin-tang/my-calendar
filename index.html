@@ -351,11 +351,12 @@
                 try {
                     // 根据当前协议选择WebSocket协议
                     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                    const wsUrl = `${protocol}//${window.location.host}/ws`;
+                    // 使用当前页面的完整路径构建WebSocket URL，支持子路径
+                    const wsUrl = `${protocol}//${window.location.host}${window.location.pathname.replace(/\/$/, '')}/ws`;
                     console.log('WebSocket URL:', wsUrl);
                     this.websocket = new WebSocket(wsUrl);
                     this.updateConnectionStatus('connecting');
-
+            
                     this.websocket.onopen = () => {
                         console.log('WebSocket连接已建立');
                         this.updateConnectionStatus('connected');
@@ -363,17 +364,17 @@
                         this.sendViewRange();
                         this.requestEvents();
                     };
-
+            
                     this.websocket.onmessage = (event) => {
                         this.handleWebSocketMessage(JSON.parse(event.data));
                     };
-
+            
                     this.websocket.onclose = () => {
                         console.log('WebSocket连接已关闭');
                         this.updateConnectionStatus('disconnected');
                         this.attemptReconnect();
                     };
-
+            
                     this.websocket.onerror = (error) => {
                         console.error('WebSocket错误:', error);
                         this.updateConnectionStatus('disconnected');

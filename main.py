@@ -11,6 +11,7 @@ from pydantic import BaseModel
 import logging
 # 添加时区支持
 import pytz
+import os
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +20,10 @@ logger = logging.getLogger(__name__)
 # 设置上海时区
 SHANGHAI_TZ = pytz.timezone('Asia/Shanghai')
 
-app = FastAPI(title="在线日历系统", description="基于FastAPI和WebSocket的实时日历应用")
+app = FastAPI(title="在线日历系统", description="基于FastAPI和WebSocket的实时日历应用" )
+
+subpath = os.getenv("ROOT_PATH", "/calendar")
+port = int(os.getenv("PORT", 8027))
 
 # 数据模型
 class Event(BaseModel):
@@ -284,7 +288,7 @@ class DatabaseManager:
 db = DatabaseManager()
 
 # WebSocket处理
-@app.websocket("/ws")
+@app.websocket(subpath+"/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     
@@ -425,11 +429,11 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.error(f"WebSocket错误: {e}")
         await manager.disconnect_websocket(websocket)
 
-# 静态文件服务
-app.mount("/static", StaticFiles(directory="."), name="static")
+# # 静态文件服务
+# app.mount("/static", StaticFiles(directory="."), name="static")
 
 # 根路径返回HTML文件
-@app.get("/")
+@app.get(subpath+"/")
 async def read_index():
     response = FileResponse('index.html')
     # 禁用缓存的响应头
@@ -439,7 +443,7 @@ async def read_index():
     return response
 
 # REST API端点（可选，用于调试和管理）
-@app.get("/api/events")
+@app.get(subpath+"/api/events")
 async def get_events(start_date: Optional[str] = None, end_date: Optional[str] = None):
     """获取事件列表"""
     if start_date and end_date:
@@ -448,7 +452,7 @@ async def get_events(start_date: Optional[str] = None, end_date: Optional[str] =
         events = db.get_all_events()
     return {"events": [event.dict() for event in events]}
 
-@app.post("/api/events")
+@app.post(subpath+"/api/events")
 async def create_event_api(event: Event):
     """创建事件（REST API）"""
     try:
@@ -464,7 +468,7 @@ async def create_event_api(event: Event):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.put("/api/events/{event_id}")
+@app.put(subpath+"/api/events/{event_id}")
 async def update_event_api(event_id: str, event: Event):
     """更新事件（REST API）"""
     event.id = event_id
@@ -481,7 +485,7 @@ async def update_event_api(event_id: str, event: Event):
     
     return {"event": updated_event.dict()}
 
-@app.delete("/api/events/{event_id}")
+@app.delete(subpath+"/api/events/{event_id}")
 async def delete_event_api(event_id: str):
     """删除事件（REST API）"""
     event = db.get_event_by_id(event_id)
@@ -512,4 +516,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8027, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port = port , log_level="info"   )

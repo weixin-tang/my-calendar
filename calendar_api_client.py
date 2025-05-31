@@ -6,7 +6,7 @@ from datetime import datetime
 class CalendarAPIClient:
     """日历API客户端，封装所有日历操作"""
     
-    def __init__(self, base_url: str = "http://localhost:8027"):
+    def __init__(self, base_url: str = "http://localhost:8027" , sub_path: str = "/calendar"):
         """
         初始化API客户端
         
@@ -14,7 +14,8 @@ class CalendarAPIClient:
             base_url: 日历服务的基础URL
         """
         self.base_url = base_url.rstrip('/')
-        self.api_base = f"{self.base_url}/api"
+        self.sub_path = sub_path.rstrip('/')
+        self.api_base = f"{self.base_url}{self.sub_path}/api"
     
     def get_events(self, start_date: Optional[str] = None, end_date: Optional[str] = None) -> List[Dict]:
         """
