@@ -806,9 +806,9 @@
                 const dayEvents = this.events.filter(event => event.date === dateStr);
                 dayEvents.forEach(event => {
                     const eventEl = document.createElement('div');
-                    eventEl.className = `event bg-${event.color}-100 text-${event.color}-800 border-l-2 border-${event.color}-500 mb-2`;
+                    eventEl.className = `event truncate md:whitespace-normal w-9 md:w-auto  bg-${event.color}-100 text-${event.color}-800 border-l-2 border-${event.color}-500 mb-2`;
                     eventEl.innerHTML = `
-                        <div class="font-medium">${event.title}</div>
+                        <div class="font-medium ">${event.title}</div>
                         ${event.time ? `<div class="text-xs opacity-75">${event.time}</div>` : ''}
                     `;
                     eventEl.addEventListener('click', (e) => {
@@ -842,7 +842,7 @@
                 const dayEvents = this.events.filter(event => event.date === dateStr);
                 dayEvents.forEach(event => {
                     const eventEl = document.createElement('div');
-                    eventEl.className = `event bg-${event.color}-100 text-${event.color}-800 border-l-2 border-${event.color}-500`;
+                    eventEl.className = `event truncate md:whitespace-normal w-9 md:w-auto bg-${event.color}-100 text-${event.color}-800 border-l-2 border-${event.color}-500`;
                     eventEl.textContent = event.title;
                     eventEl.addEventListener('click', (e) => {
                         e.stopPropagation();
