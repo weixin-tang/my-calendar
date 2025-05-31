@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import json
 import asyncio
@@ -21,6 +22,15 @@ logger = logging.getLogger(__name__)
 SHANGHAI_TZ = pytz.timezone('Asia/Shanghai')
 
 app = FastAPI(title="在线日历系统", description="基于FastAPI和WebSocket的实时日历应用" )
+
+# 添加CORS中间件支持跨域
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有源，生产环境建议指定具体域名
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 subpath = os.getenv("ROOT_PATH", "/calendar")
 port = int(os.getenv("PORT", 8027))

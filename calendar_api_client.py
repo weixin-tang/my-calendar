@@ -229,50 +229,52 @@ class CalendarAPIClient:
 # 示例用法
 if __name__ == "__main__":
     # 创建客户端
-    calendar = CalendarAPIClient(base_url = "http://localhost:8027" )
+    #calendar = CalendarAPIClient(base_url = "http://localhost:8027" )
     
-    try:
-        # 检查服务状态
-        health = calendar.get_health_status()
-        print(f"服务状态: {health}")
-        
-        # 创建事件
-        new_event = calendar.create_event(
-            title="Python API测试",
-            date="2024-01-20",
-            time="14:00",
-            description="测试Python API封装",
-            color="green"
-        )
-        print(f"创建事件: {new_event}")
-        
-        # 获取所有事件
-        events = calendar.get_events()
-        print(f"所有事件: {events}")
-        
-        # 获取特定时间区域的事件示例
-        # 示例5: 获取指定月份的事件（如2024年3月）
-        march_events = calendar.get_events("2024-03-01", "2024-03-31")
-        print(f"2024年3月事件: {march_events}")
+    calendar = CalendarAPIClient(base_url = "https://www.cisdi.net.cn/" )
+    # try:
 
-        # 更新事件
-        if new_event.get('id'):
-            updated_event = calendar.update_event(
-                event_id=new_event['id'],
-                title="更新后的Python API测试",
-                date="2024-01-20",
-                time="15:00",
-                description="更新后的描述",
-                color="red"
-            )
-            print(f"更新事件: {updated_event}")
+    # 检查服务状态
+    health = calendar.get_health_status()
+    print(f"服务状态: {health}")
+        
+    #     # 创建事件
+    #     new_event = calendar.create_event(
+    #         title="Python API测试",
+    #         date="2024-01-20",
+    #         time="14:00",
+    #         description="测试Python API封装",
+    #         color="green"
+    #     )
+    #     print(f"创建事件: {new_event}")
+        
+    #     # 获取所有事件
+    #     events = calendar.get_events()
+    #     print(f"所有事件: {events}")
+        
+    #     # 获取特定时间区域的事件示例
+    #     # 示例5: 获取指定月份的事件（如2024年3月）
+    #     march_events = calendar.get_events("2024-03-01", "2024-03-31")
+    #     print(f"2024年3月事件: {march_events}")
+
+    #     # 更新事件
+    #     if new_event.get('id'):
+    #         updated_event = calendar.update_event(
+    #             event_id=new_event['id'],
+    #             title="更新后的Python API测试",
+    #             date="2024-01-20",
+    #             time="15:00",
+    #             description="更新后的描述",
+    #             color="red"
+    #         )
+    #         print(f"更新事件: {updated_event}")
             
-            # 删除事件
-            deleted = calendar.delete_event(new_event['id'])
-            print(f"删除事件: {deleted}")
+    #         # 删除事件
+    #         deleted = calendar.delete_event(new_event['id'])
+    #         print(f"删除事件: {deleted}")
         
-        delete_result = calendar.delete_events_in_range("2024-01-01", "2024-01-31")
-        print(f"删除2024年1月事件结果: {delete_result}")
+    #     delete_result = calendar.delete_events_in_range("2024-01-01", "2024-01-31")
+    #     print(f"删除2024年1月事件结果: {delete_result}")
 
-    except Exception as e:
-        print(f"操作失败: {e}")
+    # except Exception as e:
+    #     print(f"操作失败: {e}")
