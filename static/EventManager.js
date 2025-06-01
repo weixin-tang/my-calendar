@@ -1,7 +1,7 @@
 class EventManager {
     constructor(calendar) {
         this.calendar = calendar;
-        this.events = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+        this.events =  []; //  JSON.parse(localStorage.getItem('calendarEvents')) ||
         this.selectedColor = 'blue';
         this.currentEventId = null;
     }
@@ -10,13 +10,13 @@ class EventManager {
         switch (data.type) {
             case 'events':
                 this.events = data.events || [];
-                this.saveToLocalStorage();
+                // this.saveToLocalStorage();
                 this.calendar.viewManager.renderCalendar();
                 break;
             case 'event_created':
                 if (data.event) {
                     this.events.push(data.event);
-                    this.saveToLocalStorage();
+                    // this.saveToLocalStorage();
                     this.calendar.viewManager.renderCalendar();
                     this.calendar.notificationManager.show('事件创建成功', 'success');
                 }
@@ -26,7 +26,7 @@ class EventManager {
                     const index = this.events.findIndex(e => e.id === data.event.id);
                     if (index !== -1) {
                         this.events[index] = data.event;
-                        this.saveToLocalStorage();
+                        // this.saveToLocalStorage();
                         this.calendar.viewManager.renderCalendar();
                         this.calendar.notificationManager.show('事件更新成功', 'success');
                     }
@@ -35,7 +35,7 @@ class EventManager {
             case 'event_deleted':
                 if (data.event_id) {
                     this.events = this.events.filter(e => e.id !== data.event_id);
-                    this.saveToLocalStorage();
+                    // this.saveToLocalStorage();
                     this.calendar.viewManager.renderCalendar();
                     this.calendar.notificationManager.show('事件删除成功', 'success');
                 }

@@ -27,7 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+os.makedirs("database", exist_ok=True)
 db = DatabaseManager()
 
 subpath = os.getenv("ROOT_PATH", "/calendar")
