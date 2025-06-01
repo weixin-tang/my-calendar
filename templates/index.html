@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页日历 - Calendar App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./static/styles.css" >"   
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- 连接状态指示器 (Moved to header) -->
+    <!-- <div id="connectionStatus" class="connection-status status-connecting">
+        <i class="fas fa-circle mr-2"></i>
+        <span id="statusText">连接中...</span>
+    </div> -->
+
+    <!-- 通知组件 (Moved to header) -->
+    <!-- <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div> -->
+
+    <!-- 顶部导航栏 -->
+    <!-- 在顶部导航栏添加时区显示 -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-1">
+                    <h1 class="md:text-2xl flex font-bold text-gray-900">
+                        <i class="md:mt-1 fas fa-calendar-alt text-blue-600 mr-2"></i>
+                        <div class="hidden md:block">我的日历</p>
+                    </h1>
+                    <div class="flex text-sm text-gray-500">
+                        <div class="hidden md:block">在线用户:</div>
+                        <span id="onlineUsers"></span>
+                    </div>
+                </div>
+            
+                <!-- 通知组件 -居中 -->
+                <div class="flex-grow flex justify-center">
+                    <div id="notification" class="notification">
+                        <span id="notificationText"></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- 连接状态指示器 - 靠右 -->
+                    <div id="connectionStatus" class="connection-status status-connecting">
+                        <!-- <i class="fas fa-circle mr-1"></i>  -->
+                        <!-- Adjusted margin -->
+                        <span id="statusText">连接中...</span>
+                    </div>
+                    <button id="todayBtn" class="flex  px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="mt-0 md:mt-1 fas fa-calendar-day mr-2"></i>
+                        <div class="hidden md:block">今天</div>
+                        
+                    </button>
+                    <button id="addEventBtn" class="flex px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="mt-0 md:mt-1 fas fa-plus mr-2"></i>
+                        <div class="hidden md:block">添加事件</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 日历控制栏 -->
+    <div class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-8 py-2 md:py-0 md:flex md:justify-between md:items-center md:py-4 ">
+                <div class="col-span-4 flex items-center justify-between md:flex md:items-center md:space-x-4">
+                    <button id="prevPeriod" class="md:p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-chevron-left text-gray-600"></i>
+                    </button>
+                    <h2 id="currentPeriod" class="mt-2 md:mt-0 text-sm md:text-xl font-semibold text-gray-900  text-center"></h2>
+                    <button id="nextPeriod" class="md:p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-chevron-right text-gray-600"></i>
+                    </button>
+                </div>
+                <div class="col-span-4 grid grid-cols-2 gap-1 md:flex md:items-center md:space-x-2">
+                    <button id="monthView" class="px-1 md:px-3 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium">
+                        <i class="fas fa-calendar mr-2"></i>月视图
+                    </button>
+                    <button id="weekView" class="px-1 md:px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-calendar-week mr-2"></i>周视图
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 日历主体 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white rounded-lg shadow-sm border">
+            <!-- 星期标题 -->
+            <div id="weekHeader" class="grid grid-cols-7 border-b">
+                <div class="p-4 text-center font-semibold text-gray-700 border-r">周日</div>
+                <div class="p-4 text-center font-semibold text-gray-700 border-r">周一</div>
+                <div class="p-4 text-center font-semibold text-gray-700 border-r">周二</div>
+                <div class="p-4 text-center font-semibold text-gray-700 border-r">周三</div>
+                <div class="p-4 text-center font-semibold text-gray-700 border-r">周四</div>
+                <div class="p-4 text-center font-semibold text-gray-700 border-r">周五</div>
+                <div class="p-4 text-center font-semibold text-gray-700">周六</div>
+            </div>
+            
+            <!-- 日历网格 -->
+            <div id="calendarGrid" class="calendar-grid">
+                <!-- 日历单元格将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 添加事件模态框 -->
+    <div id="eventModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-calendar-plus text-green-600 mr-2"></i>
+                    <span id="modalTitle">添加新事件</span>
+                </h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="eventForm" class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">事件标题</label>
+                    <input type="text" id="eventTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="输入事件标题" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                    <input type="date" id="eventDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">时间</label>
+                    <input type="time" id="eventTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+                    <textarea id="eventDescription" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="事件描述（可选）"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">颜色</label>
+                    <div class="flex space-x-2">
+                        <button type="button" class="color-option w-8 h-8 rounded-full bg-blue-500 border-2 border-transparent" data-color="blue"></button>
+                        <button type="button" class="color-option w-8 h-8 rounded-full bg-green-500 border-2 border-transparent" data-color="green"></button>
+                        <button type="button" class="color-option w-8 h-8 rounded-full bg-red-500 border-2 border-transparent" data-color="red"></button>
+                        <button type="button" class="color-option w-8 h-8 rounded-full bg-yellow-500 border-2 border-transparent" data-color="yellow"></button>
+                        <button type="button" class="color-option w-8 h-8 rounded-full bg-purple-500 border-2 border-transparent" data-color="purple"></button>
+                        <button type="button" class="color-option w-8 h-8 rounded-full bg-pink-500 border-2 border-transparent" data-color="pink"></button>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelEvent" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" id="saveEventBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-save mr-2"></i>保存事件
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 事件详情模态框 -->
+    <div id="eventDetailModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-calendar-check text-blue-600 mr-2"></i>
+                    事件详情
+                </h3>
+                <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="eventDetailContent" class="p-6">
+                <!-- 事件详情内容将通过JavaScript动态生成 -->
+            </div>
+            <div class="flex justify-end space-x-3 p-6 border-t">
+                <button id="deleteEvent" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <i class="fas fa-trash mr-2"></i>删除
+                </button>
+                <button id="editEvent" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-edit mr-2"></i>编辑
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/NotificationManager.js"></script>
+    <script src="static/ConnectionStatusManager.js"></script>
+    <script src="static/EventManager.js"></script>
+    <script src="static/ViewManager.js"></script>
+    <script src="static/ModalManager.js"></script>
+    <script src="static/WebSocketManager.js"></script>
+    <script src="static/Calendar.js"></script>
+    
+    <script>
+        // 初始化日历
+        document.addEventListener('DOMContentLoaded', () => {
+            new Calendar();
+        });
+    </script>
+
+
+</body>
+</html>

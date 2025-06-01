@@ -1,0 +1,135 @@
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+}
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+}
+.day-cell {
+    min-height: 120px;
+    position: relative;
+}
+.week-day-cell {
+    min-height: 200px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.event {
+    font-size: 0.75rem;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.2;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.modal {
+    display: none;
+}
+.modal.show {
+    display: flex;
+}
+.time-slot {
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 40px;
+    position: relative;
+}
+/* .connection-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+} */ /* Removed fixed positioning */
+.connection-status {
+    /* padding: 8px 16px; */ /* Adjusted padding for navbar */
+    padding: 4px 10px; /* Smaller padding for navbar */
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex; /* Added for icon and text alignment */
+    align-items: center; /* Added for icon and text alignment */
+}
+.status-connected {
+    background-color: #10b981;
+    color: white;
+}
+.status-disconnected {
+    background-color: #ef4444;
+    color: white;
+}
+.status-connecting {
+    background-color: #f59e0b;
+    color: white;
+}
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+/* .notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 300px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+.notification.show {
+    transform: translateX(0);
+} */ /* Removed fixed positioning and transform */
+.notification {
+    /* max-width: 300px; */ /* Max width might not be needed in navbar */
+    padding: 6px 12px; /* Adjusted padding for navbar */
+    border-radius: 8px;
+    font-size: 0.875rem;
+    /* transition: transform 0.3s ease; */ /* Transition might change */
+    display: none; /* Initially hidden */
+    position: relative; /* Or static, depending on flex layout */
+    z-index: 1000; /* Keep z-index if needed for overlap */
+}
+.notification.show {
+    display: block; /* Show when class 'show' is added */
+}
+.notification-success {
+    background-color: #10b981;
+    color: white;
+}
+.notification-error {
+    background-color: #ef4444;
+    color: white;
+}
+.notification-info {
+    background-color: #3b82f6;
+    color: white;
+}

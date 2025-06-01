@@ -17,9 +17,6 @@ from component.Event import Event
 from component.logger import logger
 from component.DatabaseManager import DatabaseManager , SHANGHAI_TZ
 
-
-
-
 app = FastAPI(title="在线日历系统", description="基于FastAPI和WebSocket的实时日历应用" )
 
 # 添加CORS中间件支持跨域
@@ -260,13 +257,13 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.error(f"WebSocket错误: {e}")
         await manager.disconnect_websocket(websocket)
 
-# # 静态文件服务
-# app.mount("/static", StaticFiles(directory="."), name="static")
+# 静态文件服务
+app.mount(subpath+"/static", StaticFiles(directory="static"), name="static")
 
 # 根路径返回HTML文件
 @app.get(subpath+"/")
 async def read_index():
-    response = FileResponse('static/index.html')
+    response = FileResponse('templates/index.html')
     # 禁用缓存的响应头
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"

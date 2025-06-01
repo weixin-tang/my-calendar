@@ -1,10 +1,10 @@
 import sqlite3
-from Event import Event
 import uuid 
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 import pytz
-from logger import logger
+from component.Event import Event
+from component.logger import logger
 
 
 # 设置上海时区
