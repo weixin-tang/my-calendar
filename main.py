@@ -333,7 +333,7 @@ async def delete_event_api(event_id: str):
     
     return {"message": "事件已删除"}
 
-@app.get("/api/health")
+@app.get(subpath+"/api/health")
 async def health_check():
     """健康检查"""
     return {

@@ -936,8 +936,8 @@
                 
                 if (date) {
                     dateInput.value = date;
-                } else {
-                    dateInput.value = this.formatDate(new Date()); // 这里可以保持不变，因为是当前时间
+                } else if (!this.currentEventId) { // 只有在非编辑模式下才设置当前日期
+                    dateInput.value = this.formatDate(new Date());
                 }
                 
                 modal.classList.add('show');
@@ -947,7 +947,7 @@
                 const modal = document.getElementById('eventModal');
                 modal.classList.remove('show');
                 document.getElementById('eventForm').reset();
-                this.currentEventId = null;
+                this.currentEventId = null; // 重置事件ID
                 
                 document.querySelectorAll('.color-option').forEach(btn => {
                     btn.classList.remove('border-gray-800');
@@ -1042,6 +1042,7 @@
                 const event = this.events.find(e => e.id === this.currentEventId);
                 if (!event) return;
                 
+                // 先设置表单数据
                 document.getElementById('eventTitle').value = event.title;
                 document.getElementById('eventDate').value = event.date;
                 document.getElementById('eventTime').value = event.time || '';
@@ -1053,8 +1054,14 @@
                 document.querySelector(`[data-color="${event.color}"]`).classList.add('border-gray-800');
                 this.selectedColor = event.color;
                 
+                // 保存当前事件ID
+                const eventId = this.currentEventId;
+                
                 this.closeDetailModal();
-                this.openEventModal( event.date );
+                
+                // 恢复事件ID并打开模态框
+                this.currentEventId = eventId;
+                this.openEventModal(); // 不传递日期参数，保持表单中已设置的日期
             }
 
             deleteEvent() {
