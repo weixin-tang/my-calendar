@@ -12,7 +12,7 @@ SHANGHAI_TZ = pytz.timezone('Asia/Shanghai')
 
 # 数据库管理器
 class DatabaseManager:
-    def __init__(self, db_path: str = "calendar.db"):
+    def __init__(self, db_path: str = "database/calendar.db"):
         self.db_path = db_path
         self.init_database()
     
@@ -181,4 +181,4 @@ class DatabaseManager:
             )
         return None
 
-db = DatabaseManager()
+

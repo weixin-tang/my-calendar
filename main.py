@@ -13,9 +13,9 @@ import logging
 # 添加时区支持
 import pytz
 import os
-from Event import Event
-from logger import logger
-from DatabaseManager import db , SHANGHAI_TZ
+from component.Event import Event
+from component.logger import logger
+from component.DatabaseManager import DatabaseManager , SHANGHAI_TZ
 
 
 
@@ -30,6 +30,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+db = DatabaseManager()
 
 subpath = os.getenv("ROOT_PATH", "/calendar")
 port = int(os.getenv("PORT", 8027))
@@ -264,7 +266,7 @@ async def websocket_endpoint(websocket: WebSocket):
 # 根路径返回HTML文件
 @app.get(subpath+"/")
 async def read_index():
-    response = FileResponse('index.html')
+    response = FileResponse('static/index.html')
     # 禁用缓存的响应头
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
