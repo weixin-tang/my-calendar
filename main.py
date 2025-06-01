@@ -13,9 +13,12 @@ import logging
 # 添加时区支持
 import pytz
 import os
-from component.Event import Event
-from component.logger import logger
-from component.DatabaseManager import DatabaseManager , SHANGHAI_TZ
+from Event import Event
+from logger import logger
+from DatabaseManager import db , SHANGHAI_TZ
+
+
+
 
 app = FastAPI(title="在线日历系统", description="基于FastAPI和WebSocket的实时日历应用" )
 
@@ -27,8 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-os.makedirs("database", exist_ok=True)
-db = DatabaseManager()
 
 subpath = os.getenv("ROOT_PATH", "/calendar")
 port = int(os.getenv("PORT", 8027))
@@ -257,13 +258,13 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.error(f"WebSocket错误: {e}")
         await manager.disconnect_websocket(websocket)
 
-# 静态文件服务
-app.mount(subpath+"/static", StaticFiles(directory="static"), name="static")
+# # 静态文件服务
+# app.mount("/static", StaticFiles(directory="."), name="static")
 
 # 根路径返回HTML文件
 @app.get(subpath+"/")
 async def read_index():
-    response = FileResponse('templates/index.html')
+    response = FileResponse('index.html')
     # 禁用缓存的响应头
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"

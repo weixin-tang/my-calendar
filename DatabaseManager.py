@@ -1,10 +1,10 @@
 import sqlite3
+from Event import Event
 import uuid 
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 import pytz
-from component.Event import Event
-from component.logger import logger
+from logger import logger
 
 
 # 设置上海时区
@@ -12,7 +12,7 @@ SHANGHAI_TZ = pytz.timezone('Asia/Shanghai')
 
 # 数据库管理器
 class DatabaseManager:
-    def __init__(self, db_path: str = "database/calendar.db"):
+    def __init__(self, db_path: str = "calendar.db"):
         self.db_path = db_path
         self.init_database()
     
@@ -181,4 +181,4 @@ class DatabaseManager:
             )
         return None
 
-
+db = DatabaseManager()
